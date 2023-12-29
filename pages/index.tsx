@@ -72,7 +72,7 @@ export default function Home() {
         <div>
           <div className="flex-shrink-0 flex-grow-0 flex-wrap pt-4 w-3/4 flex flex-col justify-center items-start gap-6">
             {bets.map((bet, index) => (
-              <div className="flex items-start gap-5 w-3/4">
+              <div className="flex items-start gap-5 w-3/4 " key={bet.id}>
                 <div className="flex flex-col justify-center items-center p-5 rounded-xl bg-[#242424]">
                   <div className="flex flex-col items-center justify-center w-full sm:w-[28.875rem] h-[7.5rem] text-[#f1f1ef] text-center font-['text-xl font-bold leading-[normal]']">
                     {bet.title}

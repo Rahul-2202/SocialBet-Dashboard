@@ -17,3 +17,17 @@ export async function getConflictedBets() {
   });
   return bets;
 }
+
+export async function getExpiredBets() {
+  const betsRef = collection(db, "bets");
+  const q = query(betsRef, where("status", "==", "MATCHED"));
+  const querySnapshot = await getDocs(q);
+  const bets: DocumentData[] = [];
+  querySnapshot.forEach((doc) => {
+    const bet = doc.data();
+    if (new Date(bet.expiry).getTime() <= Date.now()) {
+      bets.push(bet);
+    }
+  });
+  return bets;
+}

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { getConflictedBets } from "@/services/getBets";
+import { getConflictedBets, getExpiredBets } from "@/services/getBets";
 import { DocumentData } from "@firebase/firestore";
 import Logo from "@/public/Logo1.svg";
 import profile from "@/public/profileImage.png";
 import Image from "next/image";
 import { resolveBet } from "@/services/updateBet";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
   const [bets, setBets] = useState<DocumentData[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [tab, setTab] = useState("conflicted");
 
   const handleOptionChange = (index: number, value: string) => {
     setSelectedOptions((prevOptions) => {
@@ -21,30 +23,57 @@ export default function Home() {
   const handleResolve = async (betId: string, selectedOption: string) => {
     // Call the resolveBet function with the betId and selectedOption
     await resolveBet(betId, selectedOption);
+
+    if (tab === "conflicted") {
+      getConflictedBets().then(setBets);
+    } else if (tab === "expired") {
+      getExpiredBets().then(setBets);
+    }
   };
 
   useEffect(() => {
     // Function to fetch bets
-    const fetchBets = async () => {
-      const conflictedBets = await getConflictedBets();
-      setBets(conflictedBets);
-    };
+    if (tab === "conflicted") {
+      const fetchBets = async () => {
+        const conflictedBets = await getConflictedBets();
+        setBets(conflictedBets);
+      };
 
-    // Fetch bets initially
-    fetchBets();
+      // Fetch bets initially
+      fetchBets();
 
-    // Set up interval to fetch bets every one minute
-    const intervalId = setInterval(fetchBets, 60 * 1000);
+      // Set up interval to fetch bets every one minute
+      const intervalId = setInterval(fetchBets, 60 * 1000);
 
-    // Clean up interval on unmount
-    return () => clearInterval(intervalId);
-  }, []);
+      // Clean up interval on unmount
+      return () => clearInterval(intervalId);
+    } else if (tab === "expired") {
+      const fetchBets = async () => {
+        const expiredBets = await getExpiredBets();
+        setBets(expiredBets);
+      };
+
+      // Fetch bets initially
+      fetchBets();
+
+      // Set up interval to fetch bets every one minute
+      const intervalId = setInterval(fetchBets, 60 * 1000);
+
+      // Clean up interval on unmount
+      return () => clearInterval(intervalId);
+    }
+  }, [tab]);
   return (
     <main>
       <div className="flex-shrink-0 w-[full]  h-20 flex flex-wrap justify-between items-center mx-auto p-4 rounded-bl-xl rounded-br-xl bg-[#242424]">
-        <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Image src={Logo} alt="Logo" className="h-14 w-12 ml-8" />
-        </a>
+        <div className="flex gap-16 items-center">
+          <a
+            href="#"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
+            <Image src={Logo} alt="Logo" className="h-14 w-12 ml-8" />
+          </a>
+        </div>
         <div className="inline-flex justify-center items-center gap-3 py-1 pl-1 pr-2 mr-6 rounded-xl border border-[#7053ff]">
           <Image src={profile} alt="Profile" className="h-12 w-12 rounded-lg" />
           <div className="flex flex-col justify-center items-start">
@@ -58,8 +87,28 @@ export default function Home() {
         </div>
       </div>
       <div className="flex-shrink-0 flex-wrap pt-4 mx-auto w-3/4 flex-col items-center">
-        <div className="text-[#F1F1EF] font-bold text-3xl my-6 ">
-          Unresolved Bets
+        <div>
+          <div className="text-[#F1F1EF] font-bold text-3xl my-6 ">
+            Unresolved Bets
+          </div>
+          <div className="flex items-center gap-8 pt-2 pb-8">
+            <button
+              className={`text-lg text-[#f1f1ef] ${
+                tab === "conflicted" ? "bg-[#7053ff]" : ""
+              } px-4 py-2 rounded-lg border  border-[#7053ff] `}
+              onClick={() => setTab("conflicted")}
+            >
+              Conflicted
+            </button>
+            <button
+              className={`text-lg text-[#f1f1ef] ${
+                tab === "expired" ? "bg-[#7053ff]" : ""
+              } px-4 py-2 mx-2 rounded-lg border  border-[#7053ff]`}
+              onClick={() => setTab("expired")}
+            >
+              Expired
+            </button>
+          </div>
         </div>
         <div>
           <div className="flex-shrink-0 flex-grow-0 flex-wrap pt-4 w-3/4 flex flex-col justify-center items-start gap-6">
@@ -79,7 +128,6 @@ export default function Home() {
                       <div className="text-[#f1f1ef] w- text-center text-lg leading-[normal]">
                         {bet.id}
                       </div>
-                      di
                     </div>
                     <div className="inline-flex items-start gap-3 py-1 px-2 w-[27.813rem] rounded-lg border border-[#b3b3b3]/50">
                       <div className="text-[#b3b3b3] w-[6.313rem] text-lg font-bold leading-[normal]">
@@ -149,12 +197,13 @@ export default function Home() {
               ))
             ) : (
               <div className="mx-auto text-xl text-[#f1f1ef]">
-                <h3>There are no unresolved bets</h3>
+                <h3>There are no {tab} bets</h3>
               </div>
             )}
           </div>
         </div>
       </div>
+      <Toaster />
     </main>
   );
 }

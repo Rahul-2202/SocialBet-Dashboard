@@ -1,5 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import UserContext from "../utils/UserContext";
+import Image from "next/image";
+import Logo from "../public/Logo1 (1).svg";
+import usernameLogo from "../public/fi_3033143.svg";
+import passwordLogo from "../public/fi_3064155.svg";
 
 // import "../styles/LoginPage.module.css";
 
@@ -8,22 +12,12 @@ const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // useEffect(() => {
-  //   const loggedIn = localStorage.getItem("loggedIn");
-  //   if (loggedIn) {
-  //     setLoggedIn(true);
-  //   }
-
-  //   // Clear loggedIn from local storage when the session is over
-  //   window.onbeforeunload = () => {
-  //     localStorage.removeItem("loggedIn");
-  //   };
-
-  //   // Remove the event listener when the component is unmounted
-  //   return () => {
-  //     window.onbeforeunload = null;
-  //   };
-  // }, [setLoggedIn]);
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (loggedIn === "true") {
+      setLoggedIn(true);
+    }
+  }, [setLoggedIn]);
 
   const handleLogin = () => {
     // Define your admin user
@@ -46,23 +40,42 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <h1>Login</h1>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button onClick={handleLogin}>Login</button>
+    <div className="flex items-center justify-center h-[100vh]">
+      <div className="w-[26.375rem] h-[33.4375rem] flex-shrink-0 my-0 mx-auto px-12 py-10 rounded-xl login-container">
+        <div className="login-inputs flex flex-col gap-10 items-center">
+          <Image src={Logo} alt="Logo" className="h-36 w-30" />
+          <h1 className="text-[#F1F1EF] text-3xl">Dashboard Login</h1>
+          <div className="flex flex-col gap-4 items-center">
+            <div className="flex items-center px-4 gap-5 py-2 rounded-lg text-[#B3B3B3] w-[20.375rem] h-12 bg-[#79797940]">
+              <Image src={usernameLogo} alt="Logo" className="h-3 w-3" />
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                className="bg-transparent w-[16.04556rem] flex-shrink-0 text-[1rem] text-[#B3B3B3] outline-none"
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center px-4 gap-5 py-2 rounded-lg text-[#B3B3B3] w-[20.375rem] h-12 bg-[#79797940]">
+              <Image src={passwordLogo} alt="Logo" className="h-3 w-3" />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                className="bg-transparent w-[16.04556rem] flex-shrink-0 text-[1rem] text-[#B3B3B3]  outline-none"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="mt-2">
+              <button
+                className="bg-[#7053FF] w-80 p-3 rounded-lg text-center text-[#FFFDFA] text-lg font-bold "
+                onClick={handleLogin}
+              >
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

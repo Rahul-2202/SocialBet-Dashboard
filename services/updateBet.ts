@@ -1,14 +1,24 @@
-import { db } from "@/utils/firebase";
-import { doc, updateDoc } from "firebase/firestore";
-
 export async function resolveBet(betId: string, selectedOption: string) {
-  const betRef = doc(db, "bets", betId);
-
   // Determine the outcome based on the selected option
-  const outcome = selectedOption === "Yes" ? 1 : 0;
+  const outcome = selectedOption === "YES" ? 1 : 0;
 
-  await updateDoc(betRef, {
-    status: "SETTLED",
-    real_outcome: outcome,
-  });
+  // Make a POST request to the API endpoint
+  const response = await fetch(
+    "https://api-t5otqgiogq-uc.a.run.app/settle/resolve",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + process.env.NEXT_PUBLIC_API_JWT,
+        // Add your authorization header here if needed
+      },
+      body: JSON.stringify({ betId: betId, real_outcome: outcome }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error(`${data.error}`);
+  }
 }

@@ -9,21 +9,21 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   // Redirect to home page if logged in
-  //   if (loggedIn && router.pathname === "/login") {
-  //     router.push("/");
-  //   }
-  //   // Redirect to login page if not logged in
-  //   else if (!loggedIn && router.pathname !== "/login") {
-  //     router.push("/login");
-  //   }
-  // }, [loggedIn, router]);
+  useEffect(() => {
+    // Redirect to home page if logged in
+    if (loggedIn && router.pathname === "/login") {
+      router.push("/");
+    }
+    // Redirect to login page if not logged in
+    else if (!loggedIn && router.pathname !== "/login") {
+      router.push("/login");
+    }
+  }, [loggedIn, router]);
 
   return (
-    // <UserContext.Provider value={{ loggedIn, setLoggedIn }}>
-    <Component {...pageProps} />
-    // </UserContext.Provider>
+    <UserContext.Provider value={{ loggedIn, setLoggedIn }}>
+      <Component {...pageProps} />
+    </UserContext.Provider>
   );
 }
 

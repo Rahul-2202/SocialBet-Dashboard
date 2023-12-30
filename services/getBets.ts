@@ -31,3 +31,31 @@ export async function getExpiredBets() {
   });
   return bets;
 }
+
+export async function getUsers() {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef); // No where clause if you want all users
+  const querySnapshot = await getDocs(q);
+  const users: DocumentData[] = [];
+  querySnapshot.forEach((doc) => {
+    users.push(doc.data());
+  });
+  return users;
+}
+
+// import Papa from "papaparse";
+// import { saveAs } from "file-saver";
+
+// export async function generateUserList() {
+//   // Fetch the user data
+//   const users = await getUsers();
+
+//   // Convert the user data to CSV format
+//   const csv = Papa.unparse(users);
+
+//   // Create a blob from the CSV string
+//   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+//   // Use FileSaver to save the blob
+//   saveAs(blob, "users.csv");
+// }

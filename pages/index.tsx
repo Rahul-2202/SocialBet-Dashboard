@@ -30,6 +30,10 @@ export default function Home() {
       getExpiredBets().then(setBets);
     }
   };
+  // const getUsers = async () => {
+  //   // Call the resolveBet function with the betId and selectedOption
+  //   await generateUserList();
+  // };
 
   useEffect(() => {
     // Function to fetch bets
@@ -191,6 +195,12 @@ export default function Home() {
                       >
                         Resolve
                       </button>
+                      {/* <button
+                        className="flex justify-center cursor-pointer items-center gap-2 p-2 w-[12.8125rem] rounded-lg bg-[#7053ff] text-[#f1f1ef] text-xl font-bold leading-[normal]"
+                        onClick={() => getUsers()}
+                      >
+                        Get Users
+                      </button> */}
                     </div>
                   </div>
                 </div>

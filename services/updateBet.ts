@@ -11,7 +11,7 @@ export async function resolveBet(betId: string, selectedOption: string) {
     toast.error("Please select a bet to resolve");
     return;
   }
-  const outcome = selectedOption === "YES" ? 1 : 0;
+  const outcome = selectedOption === "YES" ? 0 : 1;
   const uid = process.env.NEXT_PUBLIC_API_UID;
 
   // Make a POST request to the API endpoint

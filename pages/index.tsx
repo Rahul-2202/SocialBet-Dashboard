@@ -69,7 +69,8 @@ export default function Home() {
   }, [tab]);
   return (
     <main>
-      <div className="flex-shrink-0 w-[full]  h-20 flex flex-wrap justify-between items-center mx-auto p-4 rounded-bl-xl rounded-br-xl bg-[#242424]">
+      {/* <Navbar /> */}
+      {/* <div className="flex-shrink-0 w-[full]  h-20 flex flex-wrap justify-between items-center mx-auto p-4 rounded-bl-xl rounded-br-xl bg-[#242424]">
         <div className="flex gap-16 items-center">
           <a
             href="#"
@@ -89,7 +90,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="flex-shrink-0 flex-wrap pt-4 mx-auto w-3/4 flex-col items-center">
         <div>
           <div className="text-[#F1F1EF] font-bold text-3xl my-6 ">

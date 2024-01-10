@@ -4,7 +4,7 @@ import type { AppProps } from "next/app";
 import React, { useEffect, useState } from "react";
 import UserContext from "../utils/UserContext";
 import { useRouter } from "next/router";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/organism/Navbar";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [loggedIn, setLoggedIn] = useState(false);

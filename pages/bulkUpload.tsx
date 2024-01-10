@@ -1,3 +1,4 @@
+import { Loader } from "@/components/atoms/loader";
 import { createBulkBets } from "@/services/createBulkBets";
 import { CsvData } from "@/types";
 import UserContext from "@/utils/UserContext";
@@ -69,11 +70,24 @@ const BulkUploadPage: React.FC = () => {
     }
   };
   const missingBets: CsvData[] = [];
+  const finalBets: {
+    title: string;
+    bet_amount: number;
+    selected_option: number;
+    expiry: number;
+  }[] = [];
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fake = () => {
+    setIsLoading(true);
+  };
 
   const handleButtonClick = async () => {
     console.log("Button clicked");
-    for (const item of data) {
-      try {
+    setIsLoading(true);
+    try {
+      for (const item of data) {
         if (
           item.title === "" ||
           item.bet_amount === "" ||
@@ -83,43 +97,52 @@ const BulkUploadPage: React.FC = () => {
           missingBets.push(item);
           continue;
         }
-        await createBulkBets(
-          item.title,
-          Number(item.bet_amount),
-          Number(item.selected_option === "yes" ? 0 : 1)
-        );
-        counter++; // increment counter after successful API call
-      } catch (error) {
-        console.error(
-          "API call failed at-----> " + counter + " <--------",
-          error
-        );
-        break; // break the loop
+        finalBets.push({
+          "title": item.title,
+          "bet_amount": Number(item.bet_amount),
+          "selected_option": Number(item.selected_option === "yes" ? 0 : 1),
+          "expiry": Number(24 * 60 * 60),
+        });
       }
+      if (!finalBets.length) {
+        toast.error("No bets to upload");
+        setIsLoading(false);
+        return;
+      }
+      await createBulkBets(finalBets);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(
+        "API call failed at-----> " + counter + " <--------",
+        error
+      );
+      setIsLoading(false);      
     }
-    console.log(counter);
     console.log("missing bets" + missingBets);
   };
 
   // ...
 
   return (
-    <div className="flex flex-col justify-center items-center text-white">
-      <h1 className="text-3xl text-white p-10">Bulk Upload Page</h1>
-      <input
-        className="pb-10 px-5 ml-20 "
-        type="file"
-        accept=".csv"
-        onChange={handleFileUpload}
-      />
-      <button
-        className="p-3 border border-blue bg-[#242424] border-[#7053ff] rounded-xl"
-        onClick={handleButtonClick}
-      >
-        Create Bets
-      </button>
+    <div className=" text-[#F1F1EF] flex-shrink-0 flex-wrap pt-4 mx-auto w-3/4 flex-col items-center">
+      <p className=" font-bold text-3xl my-6 ">Bulk Bets Upload</p>
+      <div className=" flex flex-row items-center">
+        <input
+          className="py-20 pr-28 file:bg-[#514f4f] file:px-4 file:py-1.5 file:rounded-xl file:border file:mr-7 file:cursor-pointer file:text-[#F1F1EF] text-[#a597ed] text-lg "
+          type="file"
+          accept=".csv"
+          onChange={handleFileUpload}
+        />
 
-      {/* <pre>{fileContent}</pre> */}
+        <button
+          className="px-4 py-2 border border-blue bg-[#242424] border-[#7053ff] rounded-xl text-lg mr-8"
+          onClick={handleButtonClick}
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Create Bets"}
+        </button>
+        {isLoading && <Loader />}
+      </div>
       <Toaster />
     </div>
   );

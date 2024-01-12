@@ -92,16 +92,48 @@ const BulkUploadPage: React.FC = () => {
           item.title === "" ||
           item.bet_amount === "" ||
           item.selected_option === "" ||
-          (item.selected_option !== "yes" && item.selected_option !== "no")
+          (item.selected_option !== "yes" && item.selected_option !== "no") ||
+          item.expiry_duration === ("" || undefined)
         ) {
           missingBets.push(item);
+          continue;
+        }
+        if (Number(item.bet_amount) <= 0) {
+          toast.error("Bet amount cannot be negative or zero");
+          setIsLoading(false);
+          continue;
+        }
+        //string should be a valid number
+        if (isNaN(Number(item.bet_amount))) {
+          toast.error("Bet amount should be a valid number");
+          setIsLoading(false);
+          continue;
+        }
+        //expiry duration string should be a valid number
+        if (isNaN(Number(item.expiry_duration))) {
+          toast.error("Expiry duration should be a valid number");
+          setIsLoading(false);
+          continue;
+        }
+        if (
+          Number(item.expiry_duration) <= 0 ||
+          Number(item.expiry_duration) === undefined ||
+          0
+        ) {
+          toast.error("Expiry duration cannot be negative or zero or empty");
+          setIsLoading(false);
+          continue;
+        }
+        if (item.selected_option !== "yes" && item.selected_option !== "no") {
+          toast.error("Selected option should be yes or no");
+          setIsLoading(false);
           continue;
         }
         finalBets.push({
           "title": item.title,
           "bet_amount": Number(item.bet_amount),
           "selected_option": Number(item.selected_option === "yes" ? 0 : 1),
-          "expiry": Number(24 * 60 * 60),
+          "expiry": Number(Number(item.expiry_duration) * 24 * 60 * 60),
         });
       }
       if (!finalBets.length) {
@@ -116,12 +148,10 @@ const BulkUploadPage: React.FC = () => {
         "API call failed at-----> " + counter + " <--------",
         error
       );
-      setIsLoading(false);      
+      setIsLoading(false);
     }
     console.log("missing bets" + missingBets);
   };
-
-  // ...
 
   return (
     <div className=" text-[#F1F1EF] flex-shrink-0 flex-wrap pt-4 mx-auto w-3/4 flex-col items-center">

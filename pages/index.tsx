@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { getConflictedBets, getExpiredBets } from "@/services/getBets";
 import { DocumentData } from "@firebase/firestore";
-import Logo from "@/public/Logo1.svg";
-import profile from "@/public/profileImage.png";
-import Image from "next/image";
 import { resolveBet } from "@/services/updateBet";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { Loader } from "@/components/atoms/loader";
+import { cancelBet } from "@/services/cancelBet";
 
 export default function Home() {
   const [bets, setBets] = useState<DocumentData[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [tab, setTab] = useState("conflicted");
   const [loading, setIsLoading] = useState(false);
+  const [resolvingBetId, setResolvingBetId] = useState<string | null>(null);
+  const [cancelingBetId, setCancelingBetId] = useState<string | null>(null);
 
   const handleOptionChange = (index: number, value: string) => {
     setSelectedOptions((prevOptions) => {
@@ -23,8 +23,22 @@ export default function Home() {
   };
 
   const handleResolve = async (betId: string, selectedOption: string) => {
+    if (resolvingBetId) {
+      toast.error("Please wait for the previous bet to resolve");
+      return;
+    }
     // Call the resolveBet function with the betId and selectedOption
+    console.log("click resolve");
+    setResolvingBetId(betId);
+    // ... rest of your code
+
     await resolveBet(betId, selectedOption);
+    // //timeout for 5 seconds
+    // setTimeout(() => {
+    //   setResolvingBetId(null);
+    // }, 5000);
+
+    setResolvingBetId(null);
 
     if (tab === "conflicted") {
       getConflictedBets().then(setBets);
@@ -32,10 +46,28 @@ export default function Home() {
       getExpiredBets().then(setBets);
     }
   };
-  // const getUsers = async () => {
-  //   // Call the resolveBet function with the betId and selectedOption
-  //   await generateUserList();
-  // };
+  const handleCancelBet = async (betId: string) => {
+    // Call the resolveBet function with the betId and selectedOption
+    if (cancelingBetId) {
+      toast.error("Please wait for the previous bet to cancel");
+      return;
+    }
+
+    console.log("click cancel");
+    setCancelingBetId(betId);
+    // //timeout for 5 seconds
+    // setTimeout(() => {
+    //   setCancelingBetId(null);
+    // }, 5000);
+    await cancelBet(betId);
+    setCancelingBetId(null);
+
+    if (tab === "conflicted") {
+      getConflictedBets().then(setBets);
+    } else if (tab === "expired") {
+      getExpiredBets().then(setBets);
+    }
+  };
 
   useEffect(() => {
     // Function to fetch bets
@@ -175,20 +207,38 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        <button
-                          className="flex justify-center cursor-pointer items-center gap-2 p-2 w-[12.8125rem] rounded-lg bg-[#7053ff] text-[#f1f1ef] text-xl font-bold leading-[normal]"
-                          onClick={() =>
-                            handleResolve(bet.id, selectedOptions[index])
-                          }
-                        >
-                          Resolve
-                        </button>
-                        {/* <button
-                        className="flex justify-center cursor-pointer items-center gap-2 p-2 w-[12.8125rem] rounded-lg bg-[#7053ff] text-[#f1f1ef] text-xl font-bold leading-[normal]"
-                        onClick={() => getUsers()}
-                      >
-                        Get Users
-                      </button> */}
+                        <div className="flex gap-2 items-center">
+                          <button
+                            className="flex justify-center cursor-pointer items-center gap-2 px-3 py-2 rounded-lg bg-[#7053ff] text-[#f1f1ef] text-lg font-bold leading-[normal]"
+                            onClick={() =>
+                              handleResolve(bet.id, selectedOptions[index])
+                            }
+                            disabled={cancelingBetId === bet.id}
+                          >
+                            {resolvingBetId === bet.id ? (
+                              <Loader
+                                size="h-5 w-5 mx-5"
+                                color=" border-white"
+                              />
+                            ) : (
+                              "Resolve"
+                            )}
+                          </button>
+                          <button
+                            className="flex justify-center cursor-pointer items-center gap-2 px-3.5 py-2 rounded-lg bg-[#f52f2f] text-[#f1f1ef] text-lg font-bold leading-[normal]"
+                            onClick={() => handleCancelBet(bet.id)}
+                            disabled={resolvingBetId === bet.id}
+                          >
+                            {cancelingBetId === bet.id ? (
+                              <Loader
+                                size="h-5 w-5 mx-5"
+                                color=" border-white"
+                              />
+                            ) : (
+                              "Cancel"
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

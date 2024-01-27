@@ -4,3 +4,8 @@ export type CsvData = {
   bet_amount: string;
   selected_option: string;
 };
+
+export enum OptionValues {
+  YES = "YES",
+  NO = "NO",
+}
